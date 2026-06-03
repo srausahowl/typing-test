@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Typing Test</title><style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{max-width:700px;width:100%}h1{text-align:center;font-size:28px;margin-bottom:8px}.sub{text-align:center;color:#94a3b8;margin-bottom:24px}
+.stats-bar{display:flex;justify-content:center;gap:32px;margin-bottom:24px;padding:12px;background:#1e293b;border-radius:10px}
+.stat{text-align:center}.stat .val{font-size:24px;font-weight:700;color:#38bdf8}.stat .lbl{font-size:12px;color:#94a3b8;text-transform:uppercase}
+.text-display{background:#1e293b;border-radius:12px;padding:24px;font-size:20px;line-height:1.8;margin-bottom:16px;min-height:120px;font-family:monospace;border:1px solid #334155;white-space:pre-wrap;word-break:break-word}
+.correct{color:#22c55e}.wrong{color:#ef4444;text-decoration:underline}.cursor{border-left:2px solid #38bdf8;animation:blink 1s infinite}.pending{color:#64748b}
+@keyframes blink{50%{border-color:transparent}}
+#input{position:absolute;opacity:0}
+.result{text-align:center;display:none;padding:40px;background:#1e293b;border-radius:12px;border:1px solid #334155}
+.result h2{font-size:36px;margin-bottom:8px;color:#38bdf8}.result p{color:#94a3b8;margin-bottom:24px;font-size:18px}
+.result button{padding:12px 32px;background:#38bdf8;color:#0f172a;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:16px}
+footer{text-align:center;margin-top:20px;color:#94a3b8;font-size:13px}
+</style></head><body><div class="container"><h1>Typing Test</h1><p class="sub">Type the text below as fast as you can</p>
+<div class="stats-bar"><div class="stat"><div class="val" id="wpm">0</div><div class="lbl">WPM</div></div><div class="stat"><div class="val" id="accuracy">100</div><div class="lbl">% Acc</div></div><div class="stat"><div class="val" id="timer">0</div><div class="lbl">Sec</div></div></div>
+<div class="text-display" id="display"></div><input id="input" autofocus><div class="result" id="result"><h2 id="finalWpm">0 WPM</h2><p id="finalStats"></p><button onclick="reset()">Try Again</button></div>
+<footer>Click anywhere and start typing</footer></div>
+<script>
+const TEXTS=["The quick brown fox jumps over the lazy dog near the river bank where children play in the afternoon sun","Programming is the art of telling another human being what one wants the computer to do","The best way to predict the future is to invent it today with determination and creative thinking","Every great developer you know got there by solving problems they were unqualified to solve","In the middle of difficulty lies opportunity and the willingness to learn grows stronger each day"];
+let text="",pos=0,started=false,startTime=0,timerInt=null,errors=0;
+function load(){text=TEXTS[Math.floor(Math.random()*TEXTS.length)];pos=0;started=false;errors=0;clearInterval(timerInt);document.getElementById("wpm").textContent="0";document.getElementById("accuracy").textContent="100";document.getElementById("timer").textContent="0";document.getElementById("result").style.display="none";document.getElementById("display").style.display="block";render()}
+function render(){let h="";for(let i=0;i<text.length;i++){if(i===pos)h+='<span class="cursor">';if(i<pos){h+=text[i]}else{h+='<span class="pending">'+text[i]+"</span>"}if(i===pos)h+="</span>"}document.getElementById("display").innerHTML=h;const acc=pos>0?Math.round((pos-errors)/pos*100):100;document.getElementById("accuracy").textContent=acc}
+document.addEventListener("keydown",e=>{if(document.getElementById("result").style.display==="block")return;if(e.key.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();
+if(!started){started=true;startTime=Date.now();timerInt=setInterval(()=>{document.getElementById("timer").textContent=Math.floor((Date.now()-startTime)/1000)},1000)}
+if(e.key===text[pos]){pos++}else{errors++;pos++}
+const elapsed=(Date.now()-startTime)/60000;const wpm=Math.round((pos/5)/(elapsed||0.01));document.getElementById("wpm").textContent=wpm;
+if(pos>=text.length){finish();return}render()});
+function finish(){clearInterval(timerInt);const sec=Math.floor((Date.now()-startTime)/1000);const wpm=Math.round((text.length/5)/(sec/60));const acc=Math.round((text.length-errors)/text.length*100);
+document.getElementById("display").style.display="none";document.getElementById("result").style.display="block";document.getElementById("finalWpm").textContent=wpm+" WPM";document.getElementById("finalStats").textContent=sec+"s, "+acc+"% accuracy, "+errors+" errors"}
+function reset(){load();document.getElementById("input").focus()}
+load();document.addEventListener("click",()=>document.getElementById("input").focus())
+</script></body></html>
